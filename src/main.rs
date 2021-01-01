@@ -54,13 +54,15 @@ fn main() {
     }
 }
 
-fn process_commands(c: &Client, command: &str) -> Control {
+fn process_commands(c: &Client, command: &str) {
     match command {
         "help" => list_commands(),
         "list ports" => list_ports(c),
         _ if command.starts_with("connect ports") => connect_ports(c, command),
         _ if command.starts_with("disconnect ports") => disconnect_ports(c, command),
-        _ => Control::Continue,
+        _ => {
+            println!("invalid command");
+        }
     }
 }
 

@@ -6,21 +6,19 @@ const COMMANDS: [&str; 3] = [
     "disconnect ports () ()",
 ];
 
-pub fn list_commands() -> Control {
+pub fn list_commands() {
     println!("{:?}", COMMANDS);
-    Control::Continue
 }
 
-pub fn list_ports(c: &Client) -> Control {
+pub fn list_ports(c: &Client) {
     let ports = c.ports(None, None, PortFlags::empty());
     for portid in 1..=ports.len() {
         let port = c.port_by_id(portid as u32).unwrap();
         println!("port {}: {}", portid, port.name().unwrap());
     }
-    Control::Continue
 }
 
-pub fn connect_ports(c: &Client, command: &str) -> Control {
+pub fn connect_ports(c: &Client, command: &str) {
     let ids: Vec<u32> = command[14..]
         .split(" ")
         .into_iter()
@@ -32,20 +30,17 @@ pub fn connect_ports(c: &Client, command: &str) -> Control {
 
     if port1.is_none() {
         println!("port {} could not be found", ids[0]);
-        return Control::Continue;
     }
     if port2.is_none() {
         println!("port {} could not be found", ids[1]);
-        return Control::Continue;
     }
     let connect_result = c.connect_ports(&port1.unwrap(), &port2.unwrap());
     if connect_result.is_err() {
-        println!("could not connect because of {:?}", connect_result);
+        println!("could not connect");
     }
-    Control::Continue
 }
 
-pub fn disconnect_ports(c: &Client, command: &str) -> Control {
+pub fn disconnect_ports(c: &Client, command: &str) {
     let ids: Vec<u32> = command[17..]
         .split(" ")
         .into_iter()
@@ -57,16 +52,15 @@ pub fn disconnect_ports(c: &Client, command: &str) -> Control {
 
     if port1.is_none() {
         println!("port {} could not be found", ids[0]);
-        return Control::Continue;
     }
     if port2.is_none() {
         println!("port {} could not be found", ids[1]);
-        return Control::Continue;
     }
 
     let connect_result = c.disconnect_ports(&port1.unwrap(), &port2.unwrap());
     if connect_result.is_err() {
-        println!("could not disconnect because of {:?}", connect_result);
+        println!("could not disconnect");
     }
-    Control::Continue
 }
+
+pub fn list_connections(c: &Client) {}
