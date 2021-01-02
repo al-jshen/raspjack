@@ -1,5 +1,3 @@
-//! Takes 2 audio inputs and outputs them to 2 audio outputs.
-//! All JACK notifications are also printed out.
 use jack::*;
 use raspjack::*;
 use std::io;
@@ -38,18 +36,15 @@ fn main() {
     // activate the client and start the processing
     let active_client = client.activate_async(Notifications, process).unwrap();
     let c = active_client.as_client();
+    println!("");
 
     // keep reading user commands and take appropriate action
     let mut user_input = String::new();
 
     loop {
         io::stdin().read_line(&mut user_input).ok();
-        if user_input == "quit".to_string() {
-            active_client.deactivate().unwrap();
-            break;
-        } else {
-            process_commands(c, &user_input.trim());
-        }
+        process_commands(c, &user_input.trim());
+        println!("");
         user_input = String::new();
     }
 }
@@ -58,14 +53,19 @@ fn process_commands(c: &Client, command: &str) {
     match command {
         "help" => list_commands(),
         "list ports" => list_ports(c),
-        _ if command.starts_with("connect ports") => connect_ports(c, command),
-        _ if command.starts_with("disconnect ports") => disconnect_ports(c, command),
+        "list flags" => list_flags(c),
+        "list inputs" => list_inputs(c),
+        "list outputs" => list_outputs(c),
+        "list ports full" => list_ports_full(c),
+        "list connections" => list_connections(c),
+        _ if command.starts_with("connect") => connect_ports(c, command),
+        _ if command.starts_with("disconnect") => disconnect_ports(c, command),
         _ => {
-            println!("invalid command");
+            println!("{} is invalid command", command);
         }
     }
 }
 
 fn process_signal(s: &mut [f32]) {
-    s.iter_mut().for_each(|x| *x *= 1.1);
+    s.iter_mut().for_each(|x| *x *= 1.5);
 }
